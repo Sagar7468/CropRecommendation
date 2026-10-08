@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-zi00jyo9e$2&^(yzyrnp-&y3qmui8)n2in4qr7&2ym=1_eq8uc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "crop-recommendation-system-ekfa.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
