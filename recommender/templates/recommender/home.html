@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crop Recommendation System</title>
+</head>
+
+<body>
+
+    <h1>🌱 Crop Recommendation System</h1>
+
+    <p>
+        Enter your location, soil information and climate-change scenario
+        to get crop recommendations.
+    </p>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <h2>📍 Location</h2>
+
+        <label>Location:</label><br>
+        <input type="text" name="location" required><br><br>
+
+        <label>Latitude:</label><br>
+        <input type="number" name="latitude" step="any" required><br><br>
+
+        <label>Longitude:</label><br>
+        <input type="number" name="longitude" step="any" required><br><br>
+
+
+        <h2>🌱 Soil Information</h2>
+
+        <label>Nitrogen (N):</label><br>
+        <input type="number" name="N" required><br><br>
+
+        <label>Phosphorus (P):</label><br>
+        <input type="number" name="P" required><br><br>
+
+        <label>Potassium (K):</label><br>
+        <input type="number" name="K" required><br><br>
+
+        <label>Soil pH:</label><br>
+        <input type="number" name="ph" step="any" required><br><br>
+
+
+        <h2>🌦️ Climate Information</h2>
+
+        <label>Month:</label><br>
+        <select name="month" required>
+            <option value="JAN">January</option>
+            <option value="FEB">February</option>
+            <option value="MAR">March</option>
+            <option value="APR">April</option>
+            <option value="MAY">May</option>
+            <option value="JUN">June</option>
+            <option value="JUL">July</option>
+            <option value="AUG">August</option>
+            <option value="SEP">September</option>
+            <option value="OCT">October</option>
+            <option value="NOV">November</option>
+            <option value="DEC">December</option>
+        </select>
+
+        <br><br>
+
+        <label>Temperature Change (°C):</label><br>
+        <input type="number" name="temperature_change"
+               step="any" value="2"><br><br>
+
+        <label>Rainfall Change (%):</label><br>
+        <input type="number" name="rainfall_change_percent"
+               step="any" value="-10"><br><br>
+
+
+        <button type="submit">
+            🌾 Recommend Crops
+        </button>
+
+    </form>
+
+
+    {% if result %}
+
+        <hr>
+
+        <h2>📊 Climate Results</h2>
+
+        <p>Temperature: {{ result.temperature }} °C</p>
+
+        <p>Humidity: {{ result.humidity }} %</p>
+
+        <p>Current Rainfall: {{ result.rainfall }} mm</p>
+
+        <p>Future Temperature:
+            {{ result.future_temperature }} °C
+        </p>
+
+        <p>Future Rainfall:
+            {{ result.future_rainfall }} mm
+        </p>
+
+
+        <h2>🌾 Top 3 Recommended Crops</h2>
+
+        {% for item in result.top_crops %}
+
+            <p>
+                <strong>{{ forloop.counter }}.
+                    {{ item.crop }}
+                </strong>
+                — {{ item.probability }}%
+            </p>
+
+        {% endfor %}
+
+    {% endif %}
+
+</body>
+</html>
