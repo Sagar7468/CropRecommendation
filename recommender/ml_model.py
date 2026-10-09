@@ -15,14 +15,33 @@ model = joblib.load(MODEL_PATH)
 
 
 
-def get_climate_data(latitude, longitude, month):
-    """Get climate averages and historical monthly rainfall."""
 
+def get_climate_data(latitude, longitude, month):
+    """
+    Get monthly average temperature and humidity,
+    plus estimated rainfall over a three-month period.
+
+    Rainfall period: selected month and following two months.
+    This is an approximation, not a crop-specific growing season.
+    """
     import requests
     from datetime import datetime
     from statistics import mean
 
-    # Get temperature and humidity from NASA POWER climatology.
+    month_numbers = {
+        "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4,
+        "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8,
+        "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
+    }
+
+    month = month.upper()
+
+    if month not in month_numbers:
+        raise ValueError("Invalid month selected.")
+
+    target_month = month_numbers[month]
+
+    # Get average temperature and humidity for the selected month.
     nasa_url = (
         "https://power.larc.nasa.gov/api/temporal/"
         "climatology/point"
@@ -40,30 +59,19 @@ def get_climate_data(latitude, longitude, month):
         nasa_url, params=nasa_params, timeout=30
     )
     response.raise_for_status()
-    nasa_data = response.json()["properties"]["parameter"]
 
+    nasa_data = response.json()["properties"]["parameter"]
     temperature = nasa_data["T2M"][month]
     humidity = nasa_data["RH2M"][month]
 
-    # Average the total rainfall for this month across 2016–2025.
-    month_numbers = {
-        "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4,
-        "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8,
-        "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
-    }
-
-    if month not in month_numbers:
-        raise ValueError("Invalid month selected.")
-
-    target_month = month_numbers[month]
-
+    # Retrieve daily rainfall for historical three-month periods.
     archive_url = "https://archive-api.open-meteo.com/v1/archive"
 
     archive_params = {
         "latitude": latitude,
         "longitude": longitude,
         "start_date": "2016-01-01",
-        "end_date": "2025-12-31",
+        "end_date": "2026-02-28",
         "daily": "precipitation_sum",
         "timezone": "auto",
     }
@@ -80,26 +88,45 @@ def get_climate_data(latitude, longitude, month):
         daily_data["time"],
         daily_data["precipitation_sum"],
     ):
+        if rainfall is None:
+            continue
+
         date = datetime.fromisoformat(date_text)
+        key = (date.year, date.month)
+        monthly_totals[key] = (
+            monthly_totals.get(key, 0.0) + rainfall
+        )
 
-        if date.month == target_month and rainfall is not None:
-            monthly_totals.setdefault(date.year, []).append(rainfall)
+    # Calculate three-month totals for seasons starting in 2016–2025.
+    seasonal_totals = []
 
-    # Sum daily rainfall for each selected month, year by year.
-    yearly_rainfall = [
-        sum(values)
-        for values in monthly_totals.values()
-        if values
-    ]
+    for start_year in range(2016, 2026):
+        total = 0.0
+        complete = True
 
-    if len(yearly_rainfall) < 8:
+        for offset in range(3):
+            absolute_month = target_month + offset
+            year = start_year + (absolute_month - 1) // 12
+            calendar_month = (absolute_month - 1) % 12 + 1
+            key = (year, calendar_month)
+
+            if key not in monthly_totals:
+                complete = False
+                break
+
+            total += monthly_totals[key]
+
+        if complete:
+            seasonal_totals.append(total)
+
+    if len(seasonal_totals) < 8:
         raise ValueError(
             "Not enough historical rainfall data for this location."
         )
 
-    monthly_rainfall = round(mean(yearly_rainfall), 2)
+    seasonal_rainfall = round(mean(seasonal_totals), 2)
 
-    return temperature, humidity, monthly_rainfall
+    return temperature, humidity, seasonal_rainfall
 
     response = requests.get(url, params=params, timeout=30)
     response.raise_for_status()
