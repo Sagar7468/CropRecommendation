@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .ml_model import recommend_crops
+from .ml_model import recommend_crops, get_weather_forecast
 
 
 def home(request):
@@ -41,6 +41,11 @@ def home(request):
         )
 
         result["location"] = location
+
+        result["weather"] = get_weather_forecast(
+            latitude=latitude,
+            longitude=longitude
+        )
 
     return render(
         request,
