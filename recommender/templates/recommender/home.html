@@ -1,120 +1,517 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Crop Recommendation System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroGuide | Smart Crop Recommendation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f8f1;
+            color: #24352a;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #123c2b;
+            color: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #a9df85;
+        }
+
+        header p {
+            font-size: 13px;
+            color: #d5e8d9;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #174e34, #32784b);
+            color: white;
+            padding: 55px 8%;
+        }
+
+        .hero .tag {
+            color: #c6f0a8;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-size: clamp(30px, 5vw, 46px);
+            line-height: 1.2;
+            margin: 15px 0;
+            max-width: 700px;
+        }
+
+        .hero p {
+            color: #e1eee4;
+            max-width: 650px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .intro h2 {
+            font-size: 25px;
+            color: #174e34;
+        }
+
+        .intro p {
+            color: #647268;
+            font-size: 14px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e0e9dc;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow: 0 5px 18px rgba(30, 70, 40, 0.05);
+        }
+
+        .panel h3 {
+            color: #205b38;
+            font-size: 19px;
+            margin-bottom: 5px;
+        }
+
+        .panel .description {
+            color: #778278;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field label {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d5dfd3;
+            border-radius: 8px;
+            background: #fcfdfb;
+            font-size: 14px;
+            color: #24352a;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #acd5a0;
+            border-color: #3d8955;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #7a867c;
+            margin-top: 5px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 9px;
+            background: #287444;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background: #1b5a34;
+        }
+
+        .results-title {
+            margin: 35px 0 18px;
+            color: #174e34;
+            font-size: 25px;
+        }
+
+        .climate-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .climate-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid #e0e9dc;
+        }
+
+        .climate-card .label {
+            font-size: 12px;
+            color: #718073;
+        }
+
+        .climate-card .value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #205b38;
+            margin-top: 6px;
+            overflow-wrap: anywhere;
+        }
+
+        .crop-list {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .crop-card {
+            padding: 22px;
+            border-radius: 14px;
+            background: white;
+            border: 1px solid #dce8d8;
+        }
+
+        .crop-card:first-child {
+            background: #e9f6e4;
+            border-color: #a8d39b;
+        }
+
+        .crop-number {
+            font-size: 12px;
+            color: #66816a;
+            font-weight: bold;
+        }
+
+        .crop-name {
+            text-transform: capitalize;
+            font-size: 23px;
+            font-weight: bold;
+            color: #205b38;
+            margin: 8px 0;
+        }
+
+        .probability {
+            font-size: 14px;
+            color: #536a57;
+        }
+
+        .bar {
+            background: #dce8d8;
+            height: 7px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .bar-fill {
+            background: #3e9656;
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 9px;
+            background: #fff8e7;
+            color: #78622e;
+            font-size: 12px;
+        }
+
+        .location-result {
+            color: #627565;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            background: #123c2b;
+            color: #d5e8d9;
+            padding: 25px 15px;
+            margin-top: 50px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 650px) {
+            .hero {
+                padding: 40px 6%;
+            }
+
+            .container {
+                padding: 0 14px;
+            }
+
+            .panel {
+                padding: 19px;
+            }
+
+            .form-grid,
+            .climate-grid,
+            .crop-list {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 17px 6%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h1>🌱 Crop Recommendation System</h1>
+<header>
+    <div class="brand">🌱 Agro<span>Guide</span></div>
+    <p>SMART AGRICULTURE · CLIMATE-AWARE</p>
+</header>
 
+<section class="hero">
+    <div class="tag">Intelligent Farming Assistant</div>
+    <h1>Grow Smarter with Climate-Based Crop Recommendations</h1>
     <p>
-        Enter your location, soil information and climate-change scenario
-        to get crop recommendations.
+        Explore crop recommendations using soil nutrients, geographical
+        location and climate information, with adjustable climate-change
+        scenarios.
     </p>
+</section>
+
+<main class="container">
+
+    <section class="intro">
+        <h2>Crop Recommendation Dashboard</h2>
+        <p>Enter your details below to generate your crop recommendations.</p>
+    </section>
 
     <form method="POST">
-
         {% csrf_token %}
 
-        <h2>📍 Location</h2>
+        <section class="panel">
+            <h3>📍 Location Details</h3>
+            <p class="description">
+                Enter the place and its geographical coordinates.
+            </p>
 
-        <label>Location:</label><br>
-        <input type="text" name="location" required><br><br>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="location">Location Name</label>
+                    <input id="location" type="text" name="location"
+                           placeholder="e.g. Hassan" required>
+                </div>
 
-        <label>Latitude:</label><br>
-        <input type="number" name="latitude" step="any" required><br><br>
+                <div class="field">
+                    <label for="month">Month</label>
+                    <select id="month" name="month" required>
+                        <option value="JAN">January</option>
+                        <option value="FEB">February</option>
+                        <option value="MAR">March</option>
+                        <option value="APR">April</option>
+                        <option value="MAY">May</option>
+                        <option value="JUN" selected>June</option>
+                        <option value="JUL">July</option>
+                        <option value="AUG">August</option>
+                        <option value="SEP">September</option>
+                        <option value="OCT">October</option>
+                        <option value="NOV">November</option>
+                        <option value="DEC">December</option>
+                    </select>
+                </div>
 
-        <label>Longitude:</label><br>
-        <input type="number" name="longitude" step="any" required><br><br>
+                <div class="field">
+                    <label for="latitude">Latitude</label>
+                    <input id="latitude" type="number" name="latitude"
+                           step="any" placeholder="e.g. 13.0033" required>
+                </div>
 
+                <div class="field">
+                    <label for="longitude">Longitude</label>
+                    <input id="longitude" type="number" name="longitude"
+                           step="any" placeholder="e.g. 76.1004" required>
+                </div>
+            </div>
+        </section>
 
-        <h2>🌱 Soil Information</h2>
+        <section class="panel">
+            <h3>🌱 Soil Nutrients</h3>
+            <p class="description">
+                Enter your soil nutrient values and pH.
+            </p>
 
-        <label>Nitrogen (N):</label><br>
-        <input type="number" name="N" required><br><br>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="N">Nitrogen (N)</label>
+                    <input id="N" type="number" name="N"
+                           placeholder="e.g. 90" required>
+                </div>
 
-        <label>Phosphorus (P):</label><br>
-        <input type="number" name="P" required><br><br>
+                <div class="field">
+                    <label for="P">Phosphorus (P)</label>
+                    <input id="P" type="number" name="P"
+                           placeholder="e.g. 42" required>
+                </div>
 
-        <label>Potassium (K):</label><br>
-        <input type="number" name="K" required><br><br>
+                <div class="field">
+                    <label for="K">Potassium (K)</label>
+                    <input id="K" type="number" name="K"
+                           placeholder="e.g. 43" required>
+                </div>
 
-        <label>Soil pH:</label><br>
-        <input type="number" name="ph" step="any" required><br><br>
+                <div class="field">
+                    <label for="ph">Soil pH</label>
+                    <input id="ph" type="number" name="ph" step="any"
+                           min="0" max="14" placeholder="e.g. 6.5" required>
+                </div>
+            </div>
+        </section>
 
+        <section class="panel">
+            <h3>🌦️ Climate-Change Scenario</h3>
+            <p class="description">
+                Adjust the climate values to explore a hypothetical future
+                scenario.
+            </p>
 
-        <h2>🌦️ Climate Information</h2>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="temperature_change">
+                        Temperature Change (°C)
+                    </label>
+                    <input id="temperature_change" type="number"
+                           name="temperature_change" step="any" value="2"
+                           required>
+                    <p class="hint">Example: 2 means temperature rises by 2°C.</p>
+                </div>
 
-        <label>Month:</label><br>
-        <select name="month" required>
-            <option value="JAN">January</option>
-            <option value="FEB">February</option>
-            <option value="MAR">March</option>
-            <option value="APR">April</option>
-            <option value="MAY">May</option>
-            <option value="JUN">June</option>
-            <option value="JUL">July</option>
-            <option value="AUG">August</option>
-            <option value="SEP">September</option>
-            <option value="OCT">October</option>
-            <option value="NOV">November</option>
-            <option value="DEC">December</option>
-        </select>
+                <div class="field">
+                    <label for="rainfall_change_percent">
+                        Rainfall Change (%)
+                    </label>
+                    <input id="rainfall_change_percent" type="number"
+                           name="rainfall_change_percent" step="any"
+                           value="-10" required>
+                    <p class="hint">Example: -10 means rainfall decreases by 10%.</p>
+                </div>
+            </div>
+        </section>
 
-        <br><br>
-
-        <label>Temperature Change (°C):</label><br>
-        <input type="number" name="temperature_change"
-               step="any" value="2"><br><br>
-
-        <label>Rainfall Change (%):</label><br>
-        <input type="number" name="rainfall_change_percent"
-               step="any" value="-10"><br><br>
-
-
-        <button type="submit">
-            🌾 Recommend Crops
+        <button class="submit-button" type="submit">
+            🌾 Generate Crop Recommendations
         </button>
-
     </form>
-
 
     {% if result %}
 
-        <hr>
+    <h2 class="results-title">📊 Climate Analysis</h2>
 
-        <h2>📊 Climate Results</h2>
+    {% if result.location %}
+    <p class="location-result">
+        Location: <strong>{{ result.location }}</strong>
+    </p>
+    {% endif %}
 
-        <p>Temperature: {{ result.temperature }} °C</p>
+    <div class="climate-grid">
+        <div class="climate-card">
+            <div class="label">Current Temperature</div>
+            <div class="value">{{ result.temperature }} °C</div>
+        </div>
 
-        <p>Humidity: {{ result.humidity }} %</p>
+        <div class="climate-card">
+            <div class="label">Humidity</div>
+            <div class="value">{{ result.humidity }}%</div>
+        </div>
 
-        <p>Current Rainfall: {{ result.rainfall }} mm</p>
+        <div class="climate-card">
+            <div class="label">Current Rainfall</div>
+            <div class="value">{{ result.rainfall }} mm</div>
+        </div>
 
-        <p>Future Temperature:
-            {{ result.future_temperature }} °C
-        </p>
+        <div class="climate-card">
+            <div class="label">Scenario Temperature</div>
+            <div class="value">{{ result.future_temperature }} °C</div>
+        </div>
 
-        <p>Future Rainfall:
-            {{ result.future_rainfall }} mm
-        </p>
+        <div class="climate-card">
+            <div class="label">Scenario Rainfall</div>
+            <div class="value">{{ result.future_rainfall }} mm</div>
+        </div>
+    </div>
 
+    <h2 class="results-title">🌾 Top 3 Recommended Crops</h2>
 
-        <h2>🌾 Top 3 Recommended Crops</h2>
-
+    <div class="crop-list">
         {% for item in result.top_crops %}
+        <div class="crop-card">
+            <div class="crop-number">RECOMMENDATION {{ forloop.counter }}</div>
 
-            <p>
-                <strong>{{ forloop.counter }}.
-                    {{ item.crop }}
-                </strong>
-                — {{ item.probability }}%
-            </p>
+            <div class="crop-name">{{ item.crop }}</div>
 
+            <div class="probability">
+                Model score: <strong>{{ item.probability }}%</strong>
+            </div>
+
+            <div class="bar">
+                <div class="bar-fill"
+                     style="width: {% if item.probability > 100 %}100{% elif item.probability < 0 %}0{% else %}{{ item.probability }}{% endif %}%;">
+                </div>
+            </div>
+        </div>
         {% endfor %}
+    </div>
+
+    <div class="notice">
+        <strong>Note:</strong> Crop scores are machine-learning model
+        probabilities, not guarantees of real-world crop success. Climate
+        changes entered here are hypothetical scenarios, and recommendations
+        should be validated against local agricultural advice.
+    </div>
 
     {% endif %}
 
+</main>
+
+<footer>
+    AgroGuide · Climate-Aware Crop Recommendation System<br>
+    Powered by Machine Learning, Django and NASA POWER climate data
+</footer>
+
 </body>
 </html>
+```
+
